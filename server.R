@@ -26,11 +26,18 @@ shinyServer(function(input, output){
   Dataset <- reactive({
     if (is.null(input$file)) { return(NULL) }
     else{
-      Dataset <- as.data.frame(read.csv(input$file$datapath ,header=TRUE, sep = ","))
+      Dataset <- as.data.frame(read.csv(input$file$datapath ,header=TRUE, sep = ",", stringsAsFactors = TRUE))
       rownames(Dataset) = Dataset[,1]
+      
+      indx <- sapply(Dataset, is.factor)
+      Dataset[indx] <- lapply(Dataset[indx], function(x) as.numeric(x))
+      
+      
       Dataset1 = Dataset[,2:ncol(Dataset)]
       #Dataset = t(Dataset)
-      # Dataset1 = as.data.frame(scale(Dataset1, center = T, scale = T))
+      #Dataset1 = as.data.frame(scale(Dataset1, center = T, scale = T))
+      
+      
       return(Dataset1)
     }
   })
@@ -38,15 +45,26 @@ shinyServer(function(input, output){
   Dataset2 <- reactive({
     if (is.null(input$file)) { return(NULL) }
     else{
-      Dataset <- as.data.frame(read.csv(input$file$datapath ,header=TRUE, sep = ","))
+      Dataset <- as.data.frame(read.csv(input$file$datapath ,header=TRUE, sep = ",", stringsAsFactors = TRUE))
+      
+      
       rownames(Dataset) = Dataset[,1]
+      
+      
+      indx <- sapply(Dataset, is.factor)
+      Dataset[indx] <- lapply(Dataset[indx], function(x) as.numeric(x))
+      
       Dataset1 = Dataset[,2:ncol(Dataset)]
+      
+      
       return(Dataset1)
     }
   })
   
   
-  output$up_data <- DT::renderDataTable(DT::datatable(Dataset(),options = list(pageLength =25)))
+  output$up_data <- DT::renderDataTable(
+        DT::datatable(Dataset(),options = list(pageLength =25))
+    )
   
   output$downloadData1 <- downloadHandler(
     filename = function() { "ConneCtorPDASegmentation.csv" },
