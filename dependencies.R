@@ -11,6 +11,7 @@ if (!require(ggbiplot)) {install_github("vqv/ggbiplot")};  library(ggbiplot)
 if (!require(gridExtra)) {install.packages("gridExtra")};  library(gridExtra)
 if (!require(dplyr)) {install.packages("dplyr")};  library(dplyr)
 if (!require(DT)) {install.packages("DT")};  library(DT)
+if (!require(data.table)) {install.packages("data.table")};  library(data.table)
 if (!require(dendextend)) {install.packages("dendextend")};  library(dendextend)
 
 if (!require(dplyr)) {install.packages("dplyr")};  library(dplyr)
