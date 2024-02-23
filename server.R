@@ -22,46 +22,70 @@ library('dplyr')
 
 shinyServer(function(input, output){
   
-  
-  Dataset <- reactive({
+  Dataset1 <- reactive({
     if (is.null(input$file)) { return(NULL) }
     else{
-      Dataset <- as.data.frame(read.csv(input$file$datapath ,header=TRUE, sep = ",", stringsAsFactors = TRUE))
-      rownames(Dataset) = Dataset[,1]
-      
-      indx <- sapply(Dataset, is.factor)
-      Dataset[indx] <- lapply(Dataset[indx], function(x) as.numeric(x))
-      
-      
-      Dataset1 = Dataset[,2:ncol(Dataset)]
-      #Dataset = t(Dataset)
-      #Dataset1 = as.data.frame(scale(Dataset1, center = T, scale = T))
-      
-      
-      return(Dataset1)
-    }
+    Dataset <- as.data.frame(read.csv(input$file$datapath ,header=TRUE, sep = ","))
+	  if (input$rowID) {Dataset <- data.frame(rowID = seq(1:nrow(Dataset)), Dataset)}
+    Dataset <- Dataset |> tidyr::drop_na()
+    rownames(Dataset) = Dataset[,1]
+    Dataset0 = Dataset[,2:ncol(Dataset)]
+    #Dataset = t(Dataset)
+    return(Dataset0)    } # else ends
+  })
+
+  output$colList <- renderUI({
+  varSelectInput("selVar",label = "Select Metric Variables", data = Dataset1(),
+		 multiple = TRUE,selectize = TRUE,selected = colnames(Dataset1()))  })
+
+output$fxvarselect <- renderUI({
+  varSelectInput("fxAttr",label = "Select Nonmetric Variables",data = Dataset1(),
+		 multiple = TRUE,selectize = TRUE,
+		 selected = setdiff(colnames(Dataset1()),input$selVar))  })
+
+filtered_dataset0 <- reactive({
+  if (is.null(input$file)) { 
+	  return(NULL) } else{ df1 <- Dataset1() |> dplyr::select(!!!input$selVar); return(df1)}
+	})
+	
+Data_for_algo <- reactive({
+  if (length(input$fxAttr) == 0) { return(filtered_dataset0()) 
+  	} else{ df0 <- Dataset1() |> dplyr::select(!!!input$fxAttr);
+	       df0[,1] = as.character(df0[,1]);
+	dummy_vars = fastDummies::dummy_cols(df0, select_columns = NULL, 
+					     remove_first_dummy = TRUE, 
+					     remove_selected_columns = TRUE); 
+      df1 <- dplyr::bind_cols(filtered_dataset0(), dummy_vars)	
+      }
+  #df <- dplyr::bind_cols(df1, dummy_vars)	
+  return(df1)
   })
   
-  Dataset2 <- reactive({
-    if (is.null(input$file)) { return(NULL) }
-    else{
-      Dataset <- as.data.frame(read.csv(input$file$datapath ,header=TRUE, sep = ",", stringsAsFactors = TRUE))
+ # Dataset <- reactive({
+ #   if (is.null(input$file)) { return(NULL) }
+ #   else{
+ #     Dataset <- as.data.frame(read.csv(input$file$datapath ,header=TRUE, sep = ",", stringsAsFactors = TRUE))
+ #     rownames(Dataset) = Dataset[,1]
       
-      
-      rownames(Dataset) = Dataset[,1]
-      
-      
-      indx <- sapply(Dataset, is.factor)
-      Dataset[indx] <- lapply(Dataset[indx], function(x) as.numeric(x))
-      
-      Dataset1 = Dataset[,2:ncol(Dataset)]
-      
-      
-      return(Dataset1)
-    }
-  })
+ #     indx <- sapply(Dataset, is.factor)
+ #     Dataset[indx] <- lapply(Dataset[indx], function(x) as.numeric(x))
+ #     Dataset1 = Dataset[,2:ncol(Dataset)]
+ #     #Dataset1 = as.data.frame(scale(Dataset1, center = T, scale = T))
+ #     return(Dataset1)   }
+ # })
+
   
-  
+#  Dataset2 <- reactive({
+#    if (is.null(input$file)) { return(NULL) }
+#    else{
+#      Dataset <- as.data.frame(read.csv(input$file$datapath ,header=TRUE, sep = ",", stringsAsFactors = TRUE))
+#      rownames(Dataset) = Dataset[,1]
+#      indx <- sapply(Dataset, is.factor)
+#      Dataset[indx] <- lapply(Dataset[indx], function(x) as.numeric(x))
+#      Dataset1 = Dataset[,2:ncol(Dataset)]
+#      return(Dataset1) }
+#  })
+
   output$up_data <- DT::renderDataTable(
         DT::datatable(Dataset(),options = list(pageLength =25))
     )
@@ -73,19 +97,16 @@ shinyServer(function(input, output){
     }
   )
   
-  
   # Partial example
-  output$colList <- renderUI({
-    varSelectInput("selVar",label = "Select Variables",data = Dataset(),multiple = TRUE,selectize = TRUE,selected = colnames(Dataset()))
-  })
-  
-  
-  
-  Data_for_algo <- reactive({if(input$scale==TRUE){
-    return(Dataset())
-  }else{
-    return(Dataset2())
-  }})
+#  output$colList <- renderUI({
+#    varSelectInput("selVar",label = "Select Variables",data = Dataset(),multiple = TRUE,selectize = TRUE,selected = colnames(Dataset()))
+#  })
+
+#  Data_for_algo <- reactive({if(input$scale==TRUE){
+#    return(Dataset())
+#  }else{
+#    return(Dataset2())
+#  }})
   
   
   t0 = reactive({
