@@ -17,6 +17,7 @@ library('tibble')
 library('DT')
 library('dendextend')
 library('dplyr')
+library(fastDummies)
 
 
 
@@ -122,7 +123,7 @@ Data_for_algo <- reactive({
       }
       
       else {
-        Dataset3 <- Data_for_algo() %>% dplyr::select(!!!input$selVar)
+        Dataset3 <- Data_for_algo() |> dplyr::select(!!!input$selVar)
         
         
         Dataset3 = as.data.frame(scale(Dataset3, center = FALSE, scale = apply(Dataset3, 2, sd, na.rm = TRUE)))
@@ -132,7 +133,7 @@ Data_for_algo <- reactive({
         fit = kmeans(Dataset3,input$Clust)
         Segment.Membership =  paste0("segment","_",fit$cluster)
         d = data.frame(r.name = row.names(Dataset3),Segment.Membership,Dataset3)
-        #d <- d %>% mutate(across(where(is.numeric), round, 3))
+        #d <- d |> mutate(across(where(is.numeric), round, 3))
         return(d)
       }
     })
@@ -143,13 +144,13 @@ Data_for_algo <- reactive({
         return(data.frame())
       }
       else {
-        Dataset3 <- Data_for_algo() %>% dplyr::select(!!!input$selVar)
+        Dataset3 <- Data_for_algo() |> dplyr::select(!!!input$selVar)
         distm <- dist(Dataset3, method = "euclidean") # distance matrix
         fit <- hclust(distm, method="ward") 
         Segment.Membership =  cutree(fit, k=input$Clust)
         Segment.Membership =  paste0("segment","_",Segment.Membership)
         d = data.frame(r.name = row.names(Dataset3),Segment.Membership,Dataset3)
-        #d <- d %>% mutate(across(where(is.numeric), round, 3))
+        #d <- d |> mutate(across(where(is.numeric), round, 3))
         return(d)
       }
     })
@@ -173,7 +174,7 @@ Data_for_algo <- reactive({
         return(data.frame())
       }
       else {
-        Dataset3 <- Data_for_algo() %>% dplyr::select(!!!input$selVar)
+        Dataset3 <- Data_for_algo() |> dplyr::select(!!!input$selVar)
         
         if(input$scale==TRUE){
           Dataset3 = as.data.frame(scale(Dataset3, center = TRUE, scale = TRUE))
@@ -183,7 +184,7 @@ Data_for_algo <- reactive({
         fit = kmeans(Dataset3,input$Clust)
         Segment.Membership =  paste0("segment","_",fit$cluster)
         d = data.frame(r.name = row.names(Dataset3),Segment.Membership,Dataset3)
-        d <- d %>% mutate(across(where(is.numeric), round, 3))
+        d <- d |> mutate(across(where(is.numeric), round, 3))
         return(d)
       }
     })
@@ -194,13 +195,13 @@ Data_for_algo <- reactive({
         return(data.frame())
       }
       else {
-        Dataset3 <- Data_for_algo() %>% dplyr::select(!!!input$selVar)
+        Dataset3 <- Data_for_algo() |> dplyr::select(!!!input$selVar)
         distm <- dist(Dataset3, method = "euclidean") # distance matrix
         fit <- hclust(distm, method="ward") 
         Segment.Membership =  cutree(fit, k=input$Clust)
         Segment.Membership =  paste0("segment","_",Segment.Membership)
         d = data.frame(r.name = row.names(Dataset3),Segment.Membership,Dataset3)
-        d <- d %>% mutate(across(where(is.numeric), round, 3))
+        d <- d |> mutate(across(where(is.numeric), round, 3))
         return(d)
       }
     })
@@ -231,7 +232,7 @@ Data_for_algo <- reactive({
       }
       else {
         
-        Dataset3 <- Data_for_algo() %>% dplyr::select(!!!input$selVar)
+        Dataset3 <- Data_for_algo() |> dplyr::select(!!!input$selVar)
         
         if(input$scale==TRUE){
           Dataset3 = as.data.frame(scale(Dataset3, center = TRUE, scale = TRUE))
@@ -241,23 +242,23 @@ Data_for_algo <- reactive({
         fit = kmeans(Dataset3,input$Clust)
         Segment.Membership =  paste0("segment","_",fit$cluster)
         d = data.frame(r.name = row.names(Dataset3),Segment.Membership,Dataset3)
-        d <- d %>% mutate(across(where(is.numeric), round, 3))
+        d <- d |> mutate(across(where(is.numeric), round, 3))
         
         
-        summ <- d[-1]%>% group_by(Segment.Membership) %>%
+        summ <- d[-1]|> group_by(Segment.Membership) |>
           summarise_if(is.numeric, ~round(mean(.),2))
         
-        summ_t <- as.data.frame(t(summ))%>%`colnames<-`(.[1, ]) %>% .[-1, ]
+        summ_t <- as.data.frame(t(summ))|>`colnames<-`(.[1, ]) |> .[-1, ]
         summ_t[] <- lapply(summ_t, function(x) as.numeric(as.character(x)))
-        summ_t<- summ_t %>% rownames_to_column("Variable")
+        summ_t<- summ_t |> rownames_to_column("Variable")
         
         
         brks <- quantile(summ_t[-1], probs = seq(.05, .95, .05), na.rm = TRUE)
-        clrs <- round(seq(255, 40, length.out = length(brks) + 1), 0) %>%
+        clrs <- round(seq(255, 40, length.out = length(brks) + 1), 0) |>
           {paste0("rgb(255,", ., ",", ., ")")}
         
         
-        Summary<- DT::datatable(summ_t) %>% DT::formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs))
+        Summary<- DT::datatable(summ_t) |> DT::formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs))
         
         
         return(Summary)
@@ -270,20 +271,20 @@ Data_for_algo <- reactive({
       }
       else {
         
-        summ <- t0()[-1]%>% group_by(Segment.Membership) %>%
+        summ <- t0()[-1]|> group_by(Segment.Membership) |>
           summarise_if(is.numeric, ~round(mean(.),2))
         
-        summ_t <- as.data.frame(t(summ))%>%`colnames<-`(.[1, ]) %>% .[-1, ]
+        summ_t <- as.data.frame(t(summ))|>`colnames<-`(.[1, ]) |> .[-1, ]
         summ_t[] <- lapply(summ_t, function(x) as.numeric(as.character(x)))
-        summ_t<- summ_t %>% rownames_to_column("Variable")
+        summ_t<- summ_t |> rownames_to_column("Variable")
         
         
         brks <- quantile(summ_t[-1], probs = seq(.05, .95, .05), na.rm = TRUE)
-        clrs <- round(seq(255, 40, length.out = length(brks) + 1), 0) %>%
+        clrs <- round(seq(255, 40, length.out = length(brks) + 1), 0) |>
           {paste0("rgb(255,", ., ",", ., ")")}
         
         
-        Summary<- DT::datatable(summ_t) %>% formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs))
+        Summary<- DT::datatable(summ_t) |> formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs))
         
         return(Summary)
       }
@@ -297,7 +298,7 @@ Data_for_algo <- reactive({
       return(data.frame())
     }
     else {
-      Dataset3 <- Data_for_algo() %>% dplyr::select(!!!input$selVar)
+      Dataset3 <- Data_for_algo() |> dplyr::select(!!!input$selVar)
       data.pca <- prcomp(Dataset3,center = TRUE,scale. = TRUE)
       plot(data.pca, type = "l"); abline(h=1)    
     }
@@ -314,7 +315,7 @@ Data_for_algo <- reactive({
         return(data.frame())
       }
       
-      Dataset3 <- Data_for_algo() %>% dplyr::select(!!!input$selVar)
+      Dataset3 <- Data_for_algo() |> dplyr::select(!!!input$selVar)
       fit = kmeans(Dataset3,input$Clust)
       
       classif1 = paste0("segment","_",fit$cluster)
@@ -343,13 +344,13 @@ Data_for_algo <- reactive({
         # User has not uploaded a file yet
         return(data.frame())
       }
-      Dataset3 <- Data_for_algo() %>% dplyr::select(!!!input$selVar)
+      Dataset3 <- Data_for_algo() |> dplyr::select(!!!input$selVar)
       d <- dist(Dataset3, method = "euclidean") # distance matrix
       fit <- hclust(d, method="ward.D2")  
       fit1 <- as.dendrogram(fit)
-      fit1 %>% color_branches(k = input$Clust) %>% plot(main = "Dendrogram",horiz=FALSE)
+      fit1 |> color_branches(k = input$Clust) |> plot(main = "Dendrogram",horiz=FALSE)
      
-      fit1 %>% rect.dendrogram(k=input$Clust, horiz = FALSE,
+      fit1 |> rect.dendrogram(k=input$Clust, horiz = FALSE,
                                border = 8, lty = 5, lwd = 1)
       
     })
