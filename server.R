@@ -45,7 +45,10 @@ output$fxvarselect <- renderUI({
 
 filtered_dataset0 <- reactive({
   if (is.null(input$file)) { 
-	  return(NULL) } else{ df1 <- Dataset1() |> dplyr::select(!!!input$selVar); return(df1)}
+	  return(NULL) } else{ 
+	  df1 <- Dataset1() |> dplyr::select(!!!input$selVar)
+	  if(input$scale==TRUE){ df1 <- scale(df1) }
+	  return(df1)}
 	})
 	
 Data_for_algo <- reactive({
@@ -56,8 +59,7 @@ Data_for_algo <- reactive({
 					     remove_first_dummy = TRUE, 
 					     remove_selected_columns = TRUE); 
       df1 <- dplyr::bind_cols(filtered_dataset0(), dummy_vars)	
-      }
-  #df <- dplyr::bind_cols(df1, dummy_vars)	
+      }  
   return(df1)
   })
   
