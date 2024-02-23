@@ -21,14 +21,17 @@ shinyUI(fluidPage(
   sidebarPanel(
 
     fileInput("file", "Upload Segmentation data (csv file with header)"),
+    checkboxInput("rowID", "need_rowID", FALSE),
     uiOutput("colList"),  
+    htmlOutput("fxvarselect"),
+    
     selectInput("select", "Choose Segmentation Algo", 
                        c("K-Means","Hierarchical"), selected = "K-Means"),
 
     checkboxInput("scale","scale data (for display)",value=TRUE),
     
     numericInput("Clust", "Number of Segments:", value = 3,min = 1),
-    actionButton("chnages", "Apply Changes", icon("refresh")),
+    actionButton("changes", "Apply Changes", icon("refresh")),
     br(),
 
   ),
