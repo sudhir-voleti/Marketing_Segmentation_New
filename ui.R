@@ -68,8 +68,10 @@ shinyUI(fluidPage(
                 tabPanel("Summary - Segmentation",h3(textOutput("caption1")), h4(div(textOutput("caption2"),style = "color:Red")),
                            plotOutput("plotpca",height = 400, width = 500),tableOutput('seg_count'),dataTableOutput("summary")),
                           
+                tabPanel("Simplified Tables", dataTableOutput("table1")),
                 
                 tabPanel("Plot",h3("Segments Plot"), plotOutput("plot",height = 700, width = 840)),
+                
                 tabPanel("Data Segment",br(),
                          downloadButton('downloadData4', 'Download Segmentation file (Works only in browser)'), br(),br(),
                          dataTableOutput("table"),tags$head(tags$style("tfoot {display: table-header-group;}")))
