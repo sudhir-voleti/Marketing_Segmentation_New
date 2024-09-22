@@ -228,15 +228,11 @@ shinyServer(function(input, output){
         summ_t[] <- lapply(summ_t, function(x) as.numeric(as.character(x)))
         summ_t<- summ_t %>% rownames_to_column("Variable")
         
-        
         brks <- quantile(summ_t[-1], probs = seq(.05, .95, .05), na.rm = TRUE)
         clrs <- round(seq(255, 40, length.out = length(brks) + 1), 0) %>%
           {paste0("rgb(255,", ., ",", ., ")")}
         
-        
-        Summary<- DT::datatable(summ_t) %>% DT::formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs))
-        
-        
+        Summary<- DT::datatable(summ_t) %>% DT::formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs),options = list(pageLength =25))
         return(Summary)
       }
     })  
@@ -259,9 +255,7 @@ shinyServer(function(input, output){
         clrs <- round(seq(255, 40, length.out = length(brks) + 1), 0) %>%
           {paste0("rgb(255,", ., ",", ., ")")}
         
-        
         Summary<- DT::datatable(summ_t) %>% formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs),options = list(pageLength =25))
-        
         return(Summary)
       }
     })
