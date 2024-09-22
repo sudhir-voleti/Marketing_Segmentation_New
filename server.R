@@ -356,7 +356,7 @@ df2 = round(t(fit$centers), 2)
   vec1 = vector(mode="list",length(nrow(df2)))
   for (i in 1:nrow(df2)){ vec1[i] = (max(df2[i,]) - min(df2[i,])) |> round(2)  }
   df3 = data.frame(df2, range=unlist(vec1)); #df3
-  df4 <- DT::datatable(df3, options = list(pageLength =25)
+  df4 <- DT::datatable(df3, options = list(pageLength =25))
   return(df4)
 
 })
