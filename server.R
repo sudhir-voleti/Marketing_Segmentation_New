@@ -339,8 +339,8 @@ shinyServer(function(input, output){
     }
   )
   
-  output$table1 <- renderDataTable({
- Dataset3 <- Data_for_algo() %>% dplyr::select(!!!input$selVar)
+output$table1 <- renderDataTable({
+   Dataset3 <- Data_for_algo() %>% dplyr::select(!!!input$selVar)
         
         if(input$scale==TRUE){
           Dataset3 = as.data.frame(scale(Dataset3, center = TRUE, scale = TRUE))
@@ -360,7 +360,32 @@ df2 = round(t(fit$centers), 2)
 
 })
 
-  
+ output$table2 <- renderTable({ 
+   Dataset3 <- Data_for_algo() %>% dplyr::select(!!!input$selVar)
+        
+        if(input$scale==TRUE){
+          Dataset3 = as.data.frame(scale(Dataset3, center = TRUE, scale = TRUE))
+          Dataset3 = round(Dataset3,3)
+        }
+        
+  fit = kmeans(Dataset3,input$Clust)
+  df2 = round(t(fit$centers), 2)
+  n1 = input$Clust 
+  empty_df <- data.frame(segment = colnames(df2),
+                 maxima_basis = character(n1),
+                 minima_basis = character(n1))
+
+  for (i0 in 1:n1){
+    maxima_list = NULL; minima_list = NULL
+    for (i1 in 1:nrow(df2)){
+      if (df2[i1,i0] == max(df2[i1,])) { maxima_list = c(maxima_list, rownames(df2)[i1])}
+      if (df2[i1,i0] == min(df2[i1,])) { minima_list = c(minima_list, rownames(df2)[i1])}
+    }
+    empty_df$maxima_basis[i0] = maxima_list
+    empty_df$minima_basis[i0] = minima_list
+  }
+  return(empty_df) 
+ }) 
   
 })
 
