@@ -380,10 +380,10 @@ df2 = round(t(fit$centers), 2)
     for (i1 in 1:nrow(df2)){
       if (df2[i1,i0] == max(df2[i1,])) { maxima_list = c(maxima_list, rownames(df2)[i1])}
       if (df2[i1,i0] == min(df2[i1,])) { minima_list = c(minima_list, rownames(df2)[i1])}
-    }
+    } # i1 loop ends
     empty_df$maxima_basis[i0] = maxima_list
     empty_df$minima_basis[i0] = minima_list
-  }
+  }  # i0 loop ends
   return(empty_df) 
  }) 
   
