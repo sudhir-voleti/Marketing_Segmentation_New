@@ -350,7 +350,10 @@ shinyServer(function(input, output){
 fit = kmeans(Dataset3,input$Clust)
 df2 = round(t(fit$centers), 2)
 
-vec1 = vector(mode="list",length(nrow(df2)))
+  df2 = rbind(df2, as.numeric(table(fit$cluster))); df2
+  row.names(df2)[nrow(df2)] = "segmt_size"; df2
+    
+  vec1 = vector(mode="list",length(nrow(df2)))
   for (i in 1:nrow(df2)){ vec1[i] = (max(df2[i,]) - min(df2[i,])) |> round(2)  }
   df3 = data.frame(df2, range=unlist(vec1)); df3
   return(df3)
