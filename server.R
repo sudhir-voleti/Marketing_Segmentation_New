@@ -142,7 +142,7 @@ output$summary <- renderDataTable({
         clrs <- round(seq(255, 40, length.out = length(brks) + 1), 0) %>%
           {paste0("rgb(255,", ., ",", ., ")")}
         
-        Summary<- DT::datatable(summ_t) %>% DT::formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs),options = list(pageLength =25))
+        Summary<- DT::datatable(summ_t,options = list(pageLength =25)) %>% DT::formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs))
         return(Summary)
 })
   
