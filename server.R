@@ -33,7 +33,7 @@ shinyServer(function(input, output){
       
       Dataset1 = Dataset[,2:ncol(Dataset)]
       #Dataset = t(Dataset)
-      #Dataset1 = as.data.frame(scale(Dataset1, center = T, scale = T))
+      Dataset1 = as.data.frame(scale(Dataset1, center = T, scale = T))
       return(Dataset1)
     }
   })
