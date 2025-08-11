@@ -199,7 +199,7 @@ output$summary <- renderDataTable({
           DT::formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs))
         
         return(Summary)
-})```
+})
 	
   output$plotpca = renderPlot({ 
     if (is.null(input$file)) {
@@ -306,6 +306,7 @@ output$table2 <- renderTable({
  }) 
   
 })
+
 
 
 
