@@ -63,10 +63,28 @@ shinyUI(fluidPage(
                     
                   
                 tabPanel("Data",h4("Uploaded Data"),DT::dataTableOutput('up_data') ),
-                
-                
-                tabPanel("Summary - Segmentation",h3(textOutput("caption1")), h4(div(textOutput("caption2"),style = "color:Red")),
-                           plotOutput("plotpca",height = 400, width = 500),tableOutput('seg_count'),dataTableOutput("summary")),
+                            
+ 
+                # INSERT THIS INTO YOUR UI DEFINITION
+
+tabPanel("Summary - Segmentation",
+         h3(textOutput("caption1")), 
+         h4(div(textOutput("caption2"), style = "color:Red")),
+         plotOutput("plotpca", height = 400, width = 500),
+         hr(), # Adds a visual separator
+         fluidRow(
+           column(4, 
+                  h4("Segment Sizes"), # Title for the table
+                  tableOutput('seg_count')
+           ),
+           column(8, 
+                  h4("Segment Distribution"), # Title for the pie chart
+                  plotOutput('segment_pie_chart')
+           )
+         ),
+         hr(), # Adds another visual separator
+         dataTableOutput("summary")
+)
                           
                 tabPanel("Simplified Tables", h3(textOutput("Basis Variable Ranges")), dataTableOutput("table1"),
                         h3(textOutput("Segment Extrema")), tableOutput("table2")),
@@ -82,3 +100,4 @@ shinyUI(fluidPage(
       ) 
     ) 
   )
+
