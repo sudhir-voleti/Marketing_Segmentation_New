@@ -123,15 +123,34 @@ t0 <- reactive({
 	}) # t0 ends
   
   
-  output$seg_count <- renderTable({
-    if (is.null(input$file)) { return(NULL) }
-    else{seg_table <- as.data.frame(table(t0()$Segment.Membership))
-    colnames(seg_table) <- c("Segment", "Member Count") 
-    return(seg_table)
-    }
+# REPLACE THE OLD output$seg_count WITH THIS
+
+output$seg_count <- renderTable({
+  if (is.null(input$file)) { return(NULL) }
+  else {
+    # Select only the columns to display and rename for clarity
+    df <- seg_table_reactive()[, c("Segment", "Member_Count")]
+    colnames(df) <- c("Segment", "Member Count")
+    return(df)
+  }
+})
+
+# ADD THIS REACTIVE EXPRESSION
+seg_table_reactive <- reactive({
+  if (is.null(input$file)) { return(NULL) }
+  else {
+    # Create a frequency table of segment membership
+    seg_table <- as.data.frame(table(t0()$Segment.Membership))
+    colnames(seg_table) <- c("Segment", "Member_Count")
     
-  })
-  
+    # Calculate percentages and add to the table
+    seg_table <- seg_table %>%
+      mutate(Percentage = Member_Count / sum(Member_Count) * 100)
+      
+    return(seg_table)
+  }
+})
+	
 output$table <- renderDataTable({
 	d <- t0()
 	return(d) }) 
@@ -266,4 +285,5 @@ output$table2 <- renderTable({
  }) 
   
 })
+
 
