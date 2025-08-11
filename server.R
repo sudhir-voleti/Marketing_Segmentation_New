@@ -124,7 +124,6 @@ t0 <- reactive({
   
   
 # REPLACE THE OLD output$seg_count WITH THIS
-
 output$seg_count <- renderTable({
   if (is.null(input$file)) { return(NULL) }
   else {
@@ -149,6 +148,24 @@ seg_table_reactive <- reactive({
       
     return(seg_table)
   }
+})
+
+# ADD THIS NEW PLOT OUTPUT
+output$segment_pie_chart <- renderPlot({
+  if (is.null(seg_table_reactive())) { return(NULL) }
+
+  df <- seg_table_reactive()
+  
+  # Create clean labels for the pie chart slices
+  pie_labels <- paste0(df$Segment, "\n(", round(df$Percentage, 1), "%)")
+  
+  # Use ggplot2 to create a pie chart
+  ggplot(df, aes(x = "", y = Percentage, fill = Segment)) +
+    geom_bar(width = 1, stat = "identity") +
+    coord_polar("y", start = 0) + # This turns the bar chart into a pie chart
+    theme_void() + # Removes unnecessary background and gridlines
+    geom_text(aes(label = pie_labels), position = position_stack(vjust = 0.5)) +
+    theme(legend.position = "none") # Hides the legend as labels are on the chart
 })
 	
 output$table <- renderDataTable({
@@ -285,5 +302,6 @@ output$table2 <- renderTable({
  }) 
   
 })
+
 
 
