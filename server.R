@@ -181,24 +181,26 @@ output$table <- renderDataTable({
   
 # CORRECTED: This version uses a grayscale color palette for the heatmap.
 output$summary <- renderDataTable({    
+    if (is.null(input$file)) { return(NULL) } # Return NULL if no file is uploaded
+    
 	d <- t0()
-     	summ <- d[-1]%>% group_by(Segment.Membership) %>%
-          summarise_if(is.numeric, ~round(mean(.),3))
+    summ <- d[-1] %>% 
+        group_by(Segment.Membership) %>%
+        summarise_if(is.numeric, ~round(mean(.), 3))
+    
+    summ_t <- as.data.frame(t(summ)) %>% 
+        `colnames<-`(.[1, ]) %>% 
+        .[-1, ]
         
-        summ_t <- as.data.frame(t(summ))%>%`colnames<-`(.[1, ]) %>% .[-1, ]
-        summ_t[] <- lapply(summ_t, function(x) as.numeric(as.character(x)))
-        summ_t<- summ_t %>% rownames_to_column("Variable")
-        
-        brks <- quantile(summ_t[-1], probs = seq(.05, .95, .05), na.rm = TRUE)
-        
-        # THIS IS THE LINE THAT HAS BEEN CHANGED
-        clrs <- round(seq(230, 50, length.out = length(brks) + 1), 0) %>%
-          {paste0("rgb(", ., ",", ., ",", ., ")")}
-        
-        Summary<- DT::datatable(summ_t,options = list(pageLength =25)) %>% 
-          DT::formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs))
-        
-        return(Summary)
+    summ_t[] <- lapply(summ_t, function(x) as.numeric(as.character(x)))
+    summ_t <- summ_t %>% 
+        rownames_to_column("Variable")
+    
+    # The lines creating the heatmap (brks, clrs, and formatStyle) have been removed.
+    # We now create a standard datatable.
+    Summary <- DT::datatable(summ_t, options = list(pageLength = 25))
+    
+    return(Summary)
 })
 	
   output$plotpca = renderPlot({ 
@@ -306,6 +308,7 @@ output$table2 <- renderTable({
  }) 
   
 })
+
 
 
 
