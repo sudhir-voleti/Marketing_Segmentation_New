@@ -18,9 +18,16 @@ library('DT')
 library('dendextend')
 library('dplyr')
 
-
-
 shinyServer(function(input, output){
+
+  # Reactive expression for the original uploaded data, read as-is.
+  # This will be used to display the data in the "Data" tab.
+  RawData <- reactive({
+    if (is.null(input$file)) { return(NULL) }
+    else{
+      as.data.frame(read.csv(input$file$datapath ,header=TRUE, sep = ",", stringsAsFactors = TRUE))
+    }
+  })
 
   Dataset <- reactive({
     if (is.null(input$file)) { return(NULL) }
@@ -50,9 +57,16 @@ shinyServer(function(input, output){
     }
   })
   
+  # CORRECTED: This now uses the RawData() reactive to show the original data.
+  # Numeric columns are formatted to 3 decimal places for display.
   output$up_data <- DT::renderDataTable(
-        DT::datatable(Dataset(),options = list(pageLength =25))
-    )
+    if (is.null(RawData())) {
+      return(NULL)
+    } else {
+      DT::datatable(RawData(), options = list(pageLength = 25)) %>%
+      formatRound(columns = which(sapply(RawData(), is.numeric)), digits = 3)
+    }
+  )
   
   output$downloadData1 <- downloadHandler(
     filename = function() { "ConneCtorPDASegmentation.csv" },
@@ -129,10 +143,11 @@ output$table <- renderDataTable({
     else return (NULL)
   })
   
+# CORRECTED: Switched from round(mean(.), 2) to round(mean(.), 3)
 output$summary <- renderDataTable({    
 	d <- t0()
      	summ <- d[-1]%>% group_by(Segment.Membership) %>%
-          summarise_if(is.numeric, ~round(mean(.),2))
+          summarise_if(is.numeric, ~round(mean(.),3))
         
         summ_t <- as.data.frame(t(summ))%>%`colnames<-`(.[1, ]) %>% .[-1, ]
         summ_t[] <- lapply(summ_t, function(x) as.numeric(as.character(x)))
@@ -211,26 +226,28 @@ output$summary <- renderDataTable({
     }
   )
   
+# CORRECTED: Switched from round(..., 2) to round(..., 3) in two places
 output$table1 <- renderDataTable({
 	#fit = kmeans(Dataset3,input$Clust)
 	fit <- fit1()
-	df2 = round(t(fit$centers), 2)
+	df2 = round(t(fit$centers), 3)
 
 	  df2 = rbind(df2, as.numeric(table(fit$cluster))); df2
 	  row.names(df2)[nrow(df2)] = "segmt_size"; df2
     
 	  vec1 = vector(mode="list",length(nrow(df2)))
-	  for (i in 1:nrow(df2)){ vec1[i] = (max(df2[i,]) - min(df2[i,])) |> round(2)  }
+	  for (i in 1:nrow(df2)){ vec1[i] = (max(df2[i,]) - min(df2[i,])) |> round(3)  }
 	  df3 = data.frame(df2, range=unlist(vec1)); #df3
 	  df4 <- DT::datatable(df3, options = list(pageLength =25))
 	  return(df4)
 })
 
+# CORRECTED: Switched from round(..., 2) to round(..., 3)
 output$table2 <- renderTable({ 
 
 	#fit = kmeans(Dataset3,input$Clust)
 	fit <- fit1()
-	  df2 = round(t(fit$centers), 2)
+	  df2 = round(t(fit$centers), 3)
 	  n1 = input$Clust 
 	  empty_df <- data.frame(segment = colnames(df2),
                  maxima_basis = character(n1),
