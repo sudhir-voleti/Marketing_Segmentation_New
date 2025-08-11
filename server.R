@@ -179,7 +179,7 @@ output$table <- renderDataTable({
     else return (NULL)
   })
   
-# CORRECTED: Switched from round(mean(.), 2) to round(mean(.), 3)
+# CORRECTED: This version uses a grayscale color palette for the heatmap.
 output$summary <- renderDataTable({    
 	d <- t0()
      	summ <- d[-1]%>% group_by(Segment.Membership) %>%
@@ -190,13 +190,17 @@ output$summary <- renderDataTable({
         summ_t<- summ_t %>% rownames_to_column("Variable")
         
         brks <- quantile(summ_t[-1], probs = seq(.05, .95, .05), na.rm = TRUE)
-        clrs <- round(seq(255, 40, length.out = length(brks) + 1), 0) %>%
-          {paste0("rgb(255,", ., ",", ., ")")}
         
-        Summary<- DT::datatable(summ_t,options = list(pageLength =25)) %>% DT::formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs))
+        # THIS IS THE LINE THAT HAS BEEN CHANGED
+        clrs <- round(seq(230, 50, length.out = length(brks) + 1), 0) %>%
+          {paste0("rgb(", ., ",", ., ",", ., ")")}
+        
+        Summary<- DT::datatable(summ_t,options = list(pageLength =25)) %>% 
+          DT::formatStyle(names(summ_t), backgroundColor = styleInterval(brks, clrs))
+        
         return(Summary)
-})
-  
+})```
+	
   output$plotpca = renderPlot({ 
     if (is.null(input$file)) {
       # User has not uploaded a file yet
@@ -302,6 +306,7 @@ output$table2 <- renderTable({
  }) 
   
 })
+
 
 
 
