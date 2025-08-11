@@ -84,7 +84,7 @@ tabPanel("Summary - Segmentation",
          ),
          hr(), # Adds another visual separator
          dataTableOutput("summary")
-)
+),
                           
                 tabPanel("Simplified Tables", h3(textOutput("Basis Variable Ranges")), dataTableOutput("table1"),
                         h3(textOutput("Segment Extrema")), tableOutput("table2")),
@@ -100,4 +100,5 @@ tabPanel("Summary - Segmentation",
       ) 
     ) 
   )
+
 
